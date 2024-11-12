@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shopping Cart</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="./script.js"></script>
+    <style>
+      /* Custom styles */
+      .header {
+        background-color: #4b1da8;
+        color: white;
+        text-align: center;
+        padding: 30px 0;
+      }
+
+      .header h2 {
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        color: #d1c4e9;
+        margin: 0;
+      }
+
+      .card {
+        border-radius: 5px;
+        box-shadow: 0px 1px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .product-image {
+        max-width: 100px;
+        height: auto;
+      }
+
+      .btn-change {
+        border: none;
+        background-color: #cfcfcf;
+        padding: 5px 15px;
+      }
+
+      .order-summary {
+        background-color: #f5f5f5;
+        padding: 20px;
+        border-radius: 5px;
+      }
+
+      .order-summary p {
+        margin: 0;
+      }
+
+      .total-payment {
+        font-size: 1.25rem;
+        font-weight: bold;
+      }
+
+      .form-check-label {
+        font-weight: 500;
+      }
+
+      .custom-input {
+        margin-bottom: 15px;
+      }
+
+      .btn-remove {
+        background: none;
+        border: none;
+        color: #0d6efd;
+        padding: 0;
+        outline: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="header">
+      <h2>Shopping Cart</h2>
+      <p>Home / Clothing Categories / My Shopping Cart</p>
+    </div>
+
+    <div class="container my-5">
+      <div class="row">
+        <!-- Customer Details and Payment Method -->
+        <div class="col-lg-8">
+          <h4>Customer Details</h4>
+          <div class="mb-3 card p-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <p>
+                <strong>Billing Address</strong><br /><span
+                  id="billingAddressText"
+                ></span>
+              </p>
+              <button class="btn-change" onclick="openAddressModal('billing')">
+                Change
+              </button>
+            </div>
+          </div>
+          <div class="mb-3 card p-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <p>
+                <strong>Shipping Address</strong><br /><span
+                  id="shippingAddressText"
+                ></span>
+              </p>
+              <button class="btn-change" onclick="openAddressModal('shipping')">
+                Change
+              </button>
+            </div>
+          </div>
+          <p
+            class="text-primary d-flex justify-content-end"
+            onclick="openAddressModal()"
+          >
+            + Add New Address
+          </p>
+
+          <!-- Payment Method -->
+          <!-- <h4 class="mt-4">Payment Method</h4> -->
+          <!-- <div class="card p-3">
+                    <form id="paymentForm" method="POST">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="debitCard" checked>
+                            <label class="form-check-label" for="debitCard">Debit/Credit Card</label>
+                        </div>
+
+                        <div class="my-3 ms-4">
+                            <div class="custom-input mb-3">
+                                <label for="cardNumber" class="form-label">Enter card number *</label>
+                                <input type="number" class="form-control" id="cardNumber" required>
+                            </div>
+
+                            <div class="row">
+                                <div class="col">
+                                    <label for="validDate" class="form-label">Valid Date *</label>
+                                    <input type="text" class="form-control" id="validDate" placeholder="MM / YYYY"
+                                        required>
+                                </div>
+                                <div class="col">
+                                    <label for="cvv" class="form-label">CVV *</label>
+                                    <input type="number" class="form-control" id="cvv" required>
+                                </div>
+                                <div class="col d-flex align-items-end">
+                                    <button type="submit" class="btn btn-dark w-100" id="payButton totalAmount">Pay
+                                        $<span class="totalAmount">120</span></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="netBanking">
+                            <label class="form-check-label" for="netBanking">Netbanking</label>
+                        </div>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="radio" name="paymentMethod" id="googlePay">
+                            <label class="form-check-label" for="googlePay">Google Pay/Wallet</label>
+                        </div>
+                    </form>
+                </div> -->
+
+          <h4 class="mt-4">Payment Method</h4>
+          <div class="card p-3">
+            <form id="paymentForm" method="POST">
+              <div id="paymentCarousel" class="carousel">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="paymentMethod"
+                    id="debitCard"
+                    checked
+                  />
+                  <label class="form-check-label" for="debitCard"
+                    >Debit/Credit Card</label
+                  >
+                </div>
+
+                <!-- Input Fields for Debit Card -->
+                <div class="payment-details my-3 ms-4" id="debitCardField">
+                  <div class="custom-input mb-3">
+                    <label for="cardNumber" class="form-label"
+                      >Enter card number *</label
+                    >
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="cardNumber"
+                      required
+                    />
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                      <label for="validDate" class="form-label"
+                        >Valid Date *</label
+                      >
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="validDate"
+                        placeholder="MM / YYYY"
+                        required
+                      />
+                    </div>
+                    <div class="col">
+                      <label for="cvv" class="form-label">CVV *</label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="cvv"
+                        required
+                      />
+                    </div>
+                    <div class="col d-flex align-items-end">
+                      <button
+                        type="submit"
+                        class="btn btn-dark w-100"
+                        id="payButton"
+                      >
+                        Pay $<span class="totalAmount">120</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Netbanking -->
+                <div class="form-check mt-3">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="paymentMethod"
+                    id="netBanking"
+                  />
+                  <label class="form-check-label" for="netBanking"
+                    >Netbanking</label
+                  >
+                </div>
+                <div
+                  class="payment-details"
+                  id="netBankingField"
+                  style="display: none"
+                >
+                  <div class="custom-input mb-3 my-3 ms-4">
+                    <p id="paymentMessage">
+                      Select your bank to continue with Netbanking.
+                    </p>
+                    <input type="number" class="form-control" id="netBanking" />
+                  </div>
+                </div>
+
+                <!-- Google Pay -->
+                <div class="form-check mt-3">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="paymentMethod"
+                    id="googlePay"
+                  />
+                  <label class="form-check-label" for="googlePay"
+                    >Google Pay/Wallet</label
+                  >
+                </div>
+                <div
+                  class="payment-details"
+                  id="upiField"
+                  style="display: none"
+                >
+                  <div class="custom-input mb-3 my-3 ms-4">
+                    <p id="paymentMessage">
+                      Use UPI or scan the QR code to complete the payment.
+                    </p>
+                    <div class="row">
+                      <div class="col">
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="upi"
+                          placeholder="krishna@ybl"
+                        />
+                      </div>
+                      <div class="col">
+                        <button class="btn btn-dark">Verify</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Your Order -->
+        <div class="col-lg-4 pt-4 pt-lg-0">
+          <h4>Your Order</h4>
+          <!-- Order 1 -->
+          <div class="card p-3 mb-3" id="item1">
+            <div class="d-flex">
+              <img
+                src="https://fakestoreapi.com/img/51Y5NI-I5jL._AC_UX679_.jpg"
+                alt="Product Image"
+                class="me-3 img-fluid product-image"
+              />
+
+              <div class="flex-grow-1">
+                <p>
+                  <strong>Denim Pro Jacket</strong><br />Size: XL &nbsp; Color:
+                  Blue
+                </p>
+                <div class="d-flex justify-items-center">
+                  <span class="d-flex"
+                    >$64.00 &nbsp; qty: &nbsp;
+                    <div class="dropdown">
+                      <button
+                        class="btn dropdown-toggle border"
+                        type="button"
+                        id="dropdownQuantity1"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                      >
+                        1
+                      </button>
+                      <ul
+                        class="dropdown-menu"
+                        aria-labelledby="dropdownQuantity1"
+                      >
+                        <li>
+                          <a
+                            class="dropdown-item"
+                            onclick="selectQuantity(1, 64, 1)"
+                            >1</a
+                          >
+                        </li>
+                        <li>
+                          <a
+                            class="dropdown-item"
+                            onclick="selectQuantity(2, 64, 1)"
+                            >2</a
+                          >
+                        </li>
+                        <li>
+                          <a
+                            class="dropdown-item"
+                            onclick="selectQuantity(3, 64, 1)"
+                            >3</a
+                          >
+                        </li>
+                      </ul>
+                    </div>
+                  </span>
+                </div>
+
+                <p class="text-danger">
+                  <img
+                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_YH6T1xQDo3nG9rBVGtrLLQkU3pI2RU0RuTpZLjYps8X9qQDakjzlmkI&s"
+                    alt="img"
+                    class="img-fluid"
+                    style="width: 30px"
+                  />You have saved $1.00
+                </p>
+                <button
+                  type="button"
+                  class="btn btn-remove text-primary"
+                  onclick="removeItem('1')"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Order 2 -->
+          <div class="card p-3 mb-3" id="item2">
+            <div class="d-flex">
+              <img
+                src="https://fakestoreapi.com/img/71-3HjGNDUL._AC_SY879._SX._UX._SY._UY_.jpg"
+                alt="Product Image"
+                class="me-3 img-fluid product-image"
+              />
+              <div class="flex-grow-1">
+                <p>
+                  <strong
+                    >Harbour Men Grey Solid Windcheater Sporty Jacket</strong
+                  ><br />Size: XL &nbsp; Color: Grey
+                </p>
+                <span class="d-flex"
+                  >$46.00 &nbsp; qty: &nbsp;
+                  <div class="dropdown">
+                    <button
+                      class="btn dropdown-toggle border"
+                      type="button"
+                      id="dropdownQuantity2"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      1
+                    </button>
+                    <ul
+                      class="dropdown-menu"
+                      aria-labelledby="dropdownQuantity2"
+                    >
+                      <li>
+                        <a
+                          class="dropdown-item"
+                          onclick="selectQuantity(1, 46, 2)"
+                          >1</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          class="dropdown-item"
+                          onclick="selectQuantity(2, 46, 2)"
+                          >2</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          class="dropdown-item"
+                          onclick="selectQuantity(3, 46, 2)"
+                          >3</a
+                        >
+                      </li>
+                    </ul>
+                  </div>
+                </span>
+                <p class="text-danger">
+                  <img
+                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_YH6T1xQDo3nG9rBVGtrLLQkU3pI2RU0RuTpZLjYps8X9qQDakjzlmkI&s"
+                    alt="img"
+                    class="img-fluid"
+                    style="width: 30px"
+                  />You have saved $1.00
+                </p>
+                <button
+                  type="button"
+                  class="btn btn-remove text-primary"
+                  onclick="removeItem('2')"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="order-summary mt-4 p-3">
+            <p>
+              Delivery Charges
+              <span class="float-end"
+                ><strong>$10</strong> &nbsp; Express delievery</span
+              >
+            </p>
+            <p>
+              Coupon Discount
+              <span class="float-end"
+                ><strong>$0</strong> &nbsp; No coupon available</span
+              >
+            </p>
+          </div>
+
+          <div class="order-summar card mt-4 mb-0 px-3 pt-3">
+            <p class="total-payment d-flex gap-5">
+              Total Payment <span>$<span class="totalAmount">120</span></span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Address-->
+    <div
+      class="modal fade"
+      id="addressModal"
+      tabindex="-1"
+      aria-labelledby="addressModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addressModalLabel">Add Address</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="container p-0">
+              <div class="row g-3 modal-address">
+                <div class="col-12 col-lg-6">
+                  <div class="card p-3 h-100">
+                    <p>C-290, 5th Down Street, Manchester, UK</p>
+                    <div class="d-flex gap-2">
+                      <div class="d-flex align-items-center">
+                        <input
+                          type="radio"
+                          name="billingAddress"
+                          id="billing1"
+                          value="C-290, 5th Down Street, Manchester, UK"
+                          checked
+                        />
+                        <label for="billing1" class="ms-2"
+                          >Set Billing Address</label
+                        >
+                      </div>
+                      <div class="d-flex align-items-center">
+                        <input
+                          type="radio"
+                          name="shippingAddress"
+                          id="shipping1"
+                          value="C-290, 5th Down Street, Manchester, UK"
+                        />
+                        <label for="shipping1" class="ms-2"
+                          >Set Shipping Address</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-lg-6">
+                  <div class="card p-3 h-100">
+                    <p>
+                      E/90, 15th Downtown Street, South Bay, Manchester, UK
+                      89021
+                    </p>
+                    <div class="d-flex gap-2">
+                      <div class="d-flex align-items-center">
+                        <input
+                          type="radio"
+                          name="billingAddress"
+                          id="billing2"
+                          value="E/90, 15th Downtown Street, South Bay, Manchester, UK 89021"
+                        />
+                        <label for="billing2" class="ms-2"
+                          >Set Billing Address</label
+                        >
+                      </div>
+                      <div class="d-flex align-items-center">
+                        <input
+                          type="radio"
+                          name="shippingAddress"
+                          id="shipping2"
+                          value="E/90, 15th Downtown Street, South Bay, Manchester, UK 89021"
+                          checked
+                        />
+                        <label for="shipping2" class="ms-2"
+                          >Set Shipping Address</label
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-lg-6">
+                  <div class="card p-3 h-100">
+                    <p>
+                      1245, Forbay area, 54th new street, Hampshire, UK 89721
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="text-center mt-3 d-flex justify-content-start">
+                <button
+                  type="button"
+                  class="btn btn-dark"
+                  onclick="setSelectedAddress()"
+                >
+                  Set Address
+                </button>
+              </div>
+            </div>
+            <hr />
+            <!-- New Address Form -->
+            <h6>Add a New Address</h6>
+            <form id="newAddressForm">
+              <div class="row g-3">
+                <div class="col-md-6 col-lg-4">
+                  <label for="flatNumber" class="form-label"
+                    >Flat/Condo/House Number</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="flatNumber"
+                    placeholder="Enter flat number"
+                  />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                  <label for="streetName" class="form-label"
+                    >Street Number/Name</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="streetName"
+                    placeholder="Enter street name"
+                  />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                  <label for="city" class="form-label">City</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="city"
+                    placeholder="Enter city"
+                  />
+                </div>
+                <div class="col-md-6 col-lg-4">
+                  <label for="country" class="form-label">Country</label>
+                  <select class="form-select" id="country">
+                    <option selected>Select country</option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="US">United States</option>
+                    <option value="IN">India</option>
+                  </select>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                  <label for="zipCode" class="form-label">Zip Code</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="zipCode"
+                    placeholder="Enter zip code"
+                  />
+                </div>
+              </div>
+              <button
+                type="button"
+                class="btn btn-dark mt-3"
+                onclick="addNewAddress()"
+              >
+                Add Address
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Success Modal -->
+    <div
+      class="modal fade"
+      id="paymentSuccessModal"
+      tabindex="-1"
+      aria-labelledby="paymentSuccessModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div
+              class="container d-flex justify-content-center align-items-center"
+            >
+              <img
+                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJQAAACUCAMAAABC4vDmAAAAY1BMVEX///9hvG1bumj8/vz4/Pjt9u7r9uxEs1RVuGNLtVrD48bf8OG94MHj8uXo9OnH5cqk1qp4xIGCyItqv3XZ7dub0qJywnx9xoaVz5zO6NGz3Lg+sk+u2bKKy5K5372QzZcqrD+IMZktAAAFKUlEQVR4nO2a2W7rKhRAGW0wxgODHQ/Y+f+vvBs7TZO00nlJiq7Eknoic6hYBQx7QxDKZDKZTCaTyWQymUwmk8lkMpm08KbhqR2eKNYeE0Iw7tcitcsJnfAiQChCxIInmtoIoSaUN6ObVxmaxEq0tQK/IGybtLNojcmrE3QWrlNatb85YSFwm85J/+Ykhu5CsE4m1f+YT+A0Mlrsok/lVMlfnKIN80JWiaR+6Scy0lMKizRO08+OIvux1fBAsJySSIX7Mn5f0C+HE1vhmYQUTvQ+s7t6PKyEP5zoHLdBbFOsVfq2JrUNQ2ucXrJjx3+05Oy4FKvCdE5sd3iA1DKfXaO/BjPFpKrPETt6Z7K43M5i/uWE61RSt9dNj+K2sejvNT6JVGyehCOq4/7m5OxdiqSQus2pI3hi/JxPqn/YDFPMqeKQ6h/fMTc+LvJJImMbW7bqu0A9bdA2hRPyUYF8SzVPQajwSaR0Gdt2X49MPAVXZaKIKo7Wfd8tnmOGZAGVgjBBnAsVci9BqFT/+OWP0cWu6mBRYK19dhJdKifETbQyddW99JMwLJkUUnFhgnjqJQYVY7LBi+jx19whXS5zwMOPoFiG9McvrXzqLCETJqIPzLDhkAPYXObUNnfc7EMwwc/u33UzmUwmk/lfQTnnZ5LJivgTA0zOaXFmyPDBeIQxflRm5yP/bByqSFmWywrtj9cGqaunaFp2XS6Q1NBuGZpaQoVrPUvIRZ1Y16WUsrz6j1ppfHHKyApVkDEg5rFDo2RKxCMhZoUpKrFq59iGIaxSdi2c6ofWffa2RmPoJb145MdRQseJeYLERQlrG+TkMBYVyMBQzthipmw82zPjpwNR6Cml13LTuG4hD2Vd3xMGCaAfWhSGri8qErquppvYRHdIUdN/+lZLW2yt9LwSjmITz6PiCZ4qN2+QnNcoZfxlpptUM5mHP5LC+zQ5xnbRB0E4YpeyiVJ1izdZ+D4OH2UMzXJiAyZ/JdXFl19Ls3Zezoj6kkepmQ3E0HBIxXogBXNM/I2UklGKrkfTi0X0skQpWCT8MjEzNJuQUi71vMQJt0Spfvi0FK9dlKqr+Ea1G0fTDC8Yh4ShWBFrK6a3uq43rWZYW/kW75Oh8MNSmUzmz6FHwPTwD30sf6n2XPz1S+++/2NtCLDyOO8QqnbYXdo9PiM6XcxaIN513vsZVrF9h1WJui54hfgaS2u+Q6zlLpr7N3+xY5dhFwOtywohf9VolWMQltFZ9jshTAtsjPFsFCEsO5rEcBmursDYBLPqK0Q79dI28s2h3hUCgm3gtQCpbmma8sLQtlQ8Hli35dqQ4zBYL/DhR9aJCTWm4/awUMscvy3QNqR7rxQmm4aw+yZVtLKOQ6rcssXv4LiGQDwKOw3ua84KWkkYMYjl7d5w/jkpHSS0cJfableOlTzv9HQ8RV8YdUYOELVDMCzGGjUDHgbCPyaFqF6JZV9SxyeKx503KeK1jqfUzPnj/oNPg6i4HbdqY5+SchYan0t1SPiFx1Al5io8ttfIS0HWWK2Kt9xB6h1aZ2J4nFNblFrf6YRQadvJlAWXw1RjS1mP52koOQtinXrpNDF1Wzktx2nChK2yUx3EzPhypIXW1hMW9Kz0xhN2ZyxMYsjxemwNxGxFgGeYV3y3eIDZYwZrrUHTiHEPc7wbsA2Im3O8lIFSd1Yibz08btTRAFPnn0q1pt/l9MyDj+KjGlfNkSCjh8r0D3LlTCaTyWQymUwmk8lkMplMJpPJZDJp+A+l9UjmOwjKxgAAAABJRU5ErkJggg=="
+                alt="payment_success"
+                style="width: 50%"
+                class="img-fluid"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
